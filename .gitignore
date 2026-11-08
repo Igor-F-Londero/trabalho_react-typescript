@@ -1,0 +1,17 @@
+# Dependências e builds
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Variáveis de ambiente: os .env reais ficam de fora, os .env.example vão para o repositório
+.env
+.env.*
+!.env.example
+
+# Logs, sistema e editores
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

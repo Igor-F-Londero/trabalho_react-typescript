@@ -1,0 +1,28 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: tarefas-mongo
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+
+  # API em container: `docker compose --profile app up -d --build`.
+  # No dia a dia use só o mongo + `npm run dev`.
+  api:
+    profiles: ['app']
+    build: .
+    container_name: tarefas-api
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - '3000:3000'
+    environment:
+      MONGO_URI: mongodb://mongo:27017/tarefas
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no .env}
+      PORT: 3000
+
+volumes:
+  mongo_data:

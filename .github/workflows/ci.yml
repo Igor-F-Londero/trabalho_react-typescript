@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# Um push novo cancela a execução anterior da mesma branch.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (lint, tipos e testes)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: trabalho_1_crud_backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # O React Router 8 e o Vitest 5 exigem Node 22.12+/22.22+: `check-latest` pega a 22.x mais nova.
+          node-version: 22
+          check-latest: true
+          cache: npm
+          cache-dependency-path: trabalho_1_crud_backend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      # Os testes usam um MongoDB em memória: não precisam de serviço nem de Docker.
+      - run: npm test
+
+  frontend:
+    name: Frontend (lint, build e testes)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: trabalho_2_frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          check-latest: true
+          cache: npm
+          cache-dependency-path: trabalho_2_frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      # `build` roda `tsc -b` (checagem de tipos) e depois o `vite build`.
+      - run: npm run build
+      - run: npm test
