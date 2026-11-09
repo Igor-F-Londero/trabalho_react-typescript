@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📋 Tarefas
+#  Tarefas
 
 **Organize suas tarefas em grupos e subgrupos, acompanhe o progresso e veja quanto você realmente concluiu a cada mês.**
 
@@ -16,7 +16,7 @@
 
 ---
 
-## 📖 Sobre o projeto
+##  Sobre o projeto
 
 Aplicação web completa de gerenciamento de tarefas, composta por duas partes que funcionam juntas:
 
@@ -27,7 +27,7 @@ Aplicação web completa de gerenciamento de tarefas, composta por duas partes q
 
 Cada pessoa tem sua conta e vê apenas as próprias tarefas. As tarefas podem ser colocadas dentro de **grupos aninhados** (por exemplo, `Faculdade` › `Programação Web` › `Projeto final`), com até 10 níveis, e a tela principal mostra tudo como uma árvore que dá para reorganizar arrastando.
 
-## 📸 Capturas de tela
+## Capturas de tela
 
 <table>
   <tr>
@@ -48,7 +48,7 @@ Cada pessoa tem sua conta e vê apenas as próprias tarefas. As tarefas podem se
 
 > As capturas usam os dados do usuário de demonstração criado por `npm run seed` (veja [Como executar](#-como-executar)).
 
-## ✨ Funcionalidades
+##  Funcionalidades
 
 **Conta e segurança**
 
@@ -76,7 +76,7 @@ Cada pessoa tem sua conta e vê apenas as próprias tarefas. As tarefas podem se
 - **Botões só com ícone e animados:** cada ação tem um desenho que a representa (pasta com "+", lixeira, disquete, seta de voltar…) e o botão reage ao mouse e ao teclado: a tampa da lixeira abre, o lápis escreve, o "+" gira, a seta da porta sai. Sem o texto, o nome da ação continua disponível para leitores de tela e como dica ao passar o mouse. Quem prefere menos movimento no sistema não vê as animações.
 - Os grupos que você recolheu continuam recolhidos ao recarregar a página.
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 | Camada                 | Tecnologias                                                                                                       |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
@@ -85,7 +85,7 @@ Cada pessoa tem sua conta e vê apenas as próprias tarefas. As tarefas podem se
 | **Banco**              | MongoDB 7 (via Docker Compose)                                                                                    |
 | **Testes e qualidade** | Vitest, Testing Library, Supertest, mongodb-memory-server, ESLint, oxlint, Prettier, GitHub Actions               |
 
-## 🚀 Como executar
+##  Como executar
 
 ### Pré-requisitos
 
@@ -139,7 +139,7 @@ O Docker é só uma forma prática de ter o MongoDB. Você pode usar um MongoDB 
 
 `Ctrl+C` nos terminais da API e da interface e, na pasta do backend, `docker compose down` (os dados continuam guardados; `docker compose down -v` apaga tudo).
 
-## 🔧 Variáveis de ambiente
+##  Variáveis de ambiente
 
 Cada projeto traz um arquivo `.env.example` para copiar para `.env`. O `.env` real nunca vai para o Git.
 
@@ -160,7 +160,7 @@ Cada projeto traz um arquivo `.env.example` para copiar para `.env`. O `.env` re
 | -------------- | --------------- | ----------------------- |
 | `VITE_API_URL` | Endereço da API | `http://localhost:3000` |
 
-## 🧭 Como usar a aplicação
+##  Como usar a aplicação
 
 1. **Entre ou crie sua conta** na tela de login. Mensagens de erro (senha errada, e-mail repetido, API fora do ar) aparecem logo abaixo do formulário.
 2. **Crie um grupo** com o botão de **pasta com "+"** (_Novo grupo_, por exemplo `Faculdade`). Na linha do grupo, a **pasta com degrau** cria um subgrupo dentro dele e a **caixa com visto e "+"** cria uma tarefa. Passe o mouse sobre qualquer botão para ver o nome da ação (a legenda completa está nas [capturas de tela](#-capturas-de-tela)).
@@ -176,7 +176,7 @@ Cada projeto traz um arquivo `.env.example` para copiar para `.env`. O `.env` re
 
 > Tarefas **sem prazo** não entram no resumo mensal (o mês vem do prazo), mas o resumo avisa quantas ficaram de fora.
 
-## 🔐 Como funciona a autenticação por cookies
+##  Como funciona a autenticação por cookies
 
 ```text
 Navegador                                   API
@@ -197,7 +197,7 @@ Navegador                                   API
 - O CORS aceita somente a origem definida em `FRONTEND_URL`, com credenciais.
 - Contra tentativas de adivinhar senhas, `POST /auth/login` e `POST /auth/register` aceitam **20 tentativas a cada 15 minutos por IP** (depois disso, erro 429). `GET /auth/me` e `POST /auth/logout` não entram nessa conta, então recarregar a página não gasta a cota.
 
-## 🔌 API
+##  API
 
 A documentação interativa fica em **http://localhost:3000/docs** (Swagger). Resumo das rotas; todas, exceto as de cadastro e login, exigem sessão.
 
@@ -215,7 +215,7 @@ A documentação interativa fica em **http://localhost:3000/docs** (Swagger). Re
 | GET, PUT, DELETE | `/tarefas/:id`           | Consulta, atualiza e exclui                                         |
 | GET              | `/health`                | Verifica a API e o banco                                            |
 
-## 🗂️ Organização do projeto
+##  Organização do projeto
 
 ```text
 .
@@ -245,7 +245,7 @@ A documentação interativa fica em **http://localhost:3000/docs** (Swagger). Re
 
 O fluxo de uma requisição na API é `rota → autenticação → validação (Zod) → controller → service → model`, com tratamento de erros centralizado. Mais detalhes em [`trabalho_1_crud_backend/roadmap.md`](trabalho_1_crud_backend/roadmap.md).
 
-## 💡 Decisões de projeto
+##  Decisões de projeto
 
 - **Cookie `HttpOnly` em vez de `localStorage`:** o token fica fora do alcance do JavaScript da página, o que reduz o estrago de uma falha de XSS.
 - **Grupos como lista de adjacência:** cada grupo guarda só o `pai`. A profundidade e a subárvore são consultadas no próprio banco com `$graphLookup`, e ciclos e disputas entre requisições simultâneas são tratados na camada de serviço.
@@ -258,7 +258,7 @@ O fluxo de uma requisição na API é `rota → autenticação → validação (
 - **Dados de demonstração com histórico:** o `seed` gera tarefas em 8 meses ao redor de hoje, sempre relativas à data em que roda (sem sorteios, então o resultado é reproduzível), para o gráfico do resumo mensal aparecer cheio e com valores diferentes a cada mês.
 - **Desenvolvimento orientado a testes:** as funcionalidades novas foram escritas começando pelos testes.
 
-## ✅ Testes e qualidade
+##  Testes e qualidade
 
 ```bash
 # Backend (na pasta trabalho_1_crud_backend)
@@ -274,7 +274,7 @@ npm run build         # checa os tipos e gera a versão de produção
 
 O repositório traz um workflow do GitHub Actions (`.github/workflows/ci.yml`, na raiz) que roda em todo push e pull request, com um job para cada projeto: **backend** (`npm ci`, lint, typecheck e testes) e **frontend** (`npm ci`, lint, build e testes). Os testes do backend usam um MongoDB em memória, então o CI não precisa de serviços extras.
 
-## 🩺 Solução de problemas
+## Solução de problemas
 
 | Sintoma                                                    | Causa provável                                                               | O que fazer                                                                                       |
 | ---------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
@@ -285,7 +285,7 @@ O repositório traz um workflow do GitHub Actions (`.github/workflows/ci.yml`, n
 | "Muitas tentativas. Tente novamente mais tarde." ao entrar | Mais de 20 logins ou cadastros em 15 minutos a partir do mesmo IP (erro 429) | Aguarde até 15 minutos, ou reinicie a API em desenvolvimento (o contador fica em memória)         |
 | `docker compose` não encontrado                            | Docker não instalado                                                         | Instale o Docker, ou use um MongoDB local/Atlas (veja [Sem Docker](#sem-docker))                  |
 
-## ⚠️ Limitações conhecidas
+##  Limitações conhecidas
 
 - Se a aba for fechada ou recarregada nos 6 segundos do "Desfazer", a exclusão não é enviada e o item volta.
 - O login também devolve o token no corpo da resposta, para facilitar o uso pelo Swagger. O frontend ignora esse valor e usa só o cookie.
