@@ -50,3 +50,41 @@ jobs:
       # `build` roda `tsc -b` (checagem de tipos) e depois o `vite build`.
       - run: npm run build
       - run: npm test
+
+  e2e:
+    name: Ponta a ponta (Firefox, frontend, API e MongoDB em memória)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          check-latest: true
+          cache: npm
+          cache-dependency-path: |
+            e2e/package-lock.json
+            trabalho_1_crud_backend/package-lock.json
+            trabalho_2_frontend/package-lock.json
+      # Os testes usam o código das duas outras pastas: a API roda a partir do fonte e o frontend é compilado.
+      - run: npm ci
+      - run: npm ci
+        working-directory: trabalho_1_crud_backend
+      - run: npm ci
+        working-directory: trabalho_2_frontend
+      - run: npx playwright install --with-deps firefox
+      - run: npm run typecheck
+      # Sobe MongoDB em memória + API + frontend compilado e controla um Firefox de verdade (ver e2e/README.md).
+      - run: npm test
+      # Se algo falhar, o relatório traz as capturas de tela e o passo a passo (trace) de cada teste.
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: relatorio-e2e
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7

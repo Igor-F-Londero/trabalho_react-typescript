@@ -220,8 +220,11 @@ A documentação interativa fica em **http://localhost:3000/docs** (Swagger). Re
 
 ```text
 .
-├── .github/workflows/ci.yml       integração contínua (GitHub Actions): backend e frontend
+├── .github/workflows/ci.yml       integração contínua (GitHub Actions): backend, frontend e ponta a ponta
 ├── docs/screenshots/              capturas de tela usadas neste README
+├── e2e/                           testes de ponta a ponta (Playwright + Firefox)
+│   ├── servidor/api.ts            sobe a API de verdade com um MongoDB em memória
+│   └── tests/                     cenários: login e sessão, tarefas e grupos, página de resumo
 ├── trabalho_1_crud_backend/       API (Express + MongoDB)
 │   ├── src/
 │   │   ├── config/                variáveis de ambiente, conexão com o banco, Swagger
@@ -259,6 +262,7 @@ O fluxo de uma requisição na API é `rota → autenticação → validação (
 - **Rotas com React Router:** `/login` é pública; `/` e `/resumo` ficam dentro de uma rota-pai (`AreaLogada`) que faz a guarda de sessão e desenha o cabeçalho, em vez de repetir a verificação em cada página. A página de resumo é carregada sob demanda (`React.lazy`): a biblioteca de gráficos só é baixada quando a pessoa abre `/resumo` (o pacote principal ficou em ~370 kB, contra ~870 kB com tudo junto).
 - **Botões só com ícone, acessíveis:** um único componente (`BotaoIcone`) recebe o ícone e um `rotulo` que descreve a ação exata; ele vira `aria-label` e `title`. As animações ficam no CSS: cada ícone tem as partes que se mexem (tampa, seta, "+") com classe própria, acionadas por `:hover` e `:focus-visible`, e `prefers-reduced-motion` as desliga. A tela de login mantém o texto, porque ali o botão é o próprio formulário.
 - **Dados de demonstração com histórico:** o `seed` gera tarefas em 8 meses ao redor de hoje, sempre relativas à data em que roda (sem sorteios, então o resultado é reproduzível), para o gráfico do resumo mensal aparecer cheio e com valores diferentes a cada mês.
+- **Testes de ponta a ponta contra a API real, sem mocks:** o `e2e/` sobe o backend de verdade (o mesmo código do `server.ts`) em cima de um MongoDB em memória e o frontend já compilado, em portas à parte (3100 e 5174), para rodar com o app de desenvolvimento aberto. Cada teste cria a própria conta, então eles não dependem uns dos outros e rodam em paralelo.
 - **Desenvolvimento orientado a testes:** as funcionalidades novas foram escritas começando pelos testes.
 
 ##  Testes e qualidade
@@ -273,9 +277,16 @@ npm run typecheck
 npm test              # 184 testes
 npm run lint
 npm run build         # checa os tipos e gera a versão de produção
+
+# Ponta a ponta (na pasta e2e; as pastas dos dois projetos precisam ter rodado `npm install`)
+npm install
+npx playwright install firefox   # baixa o navegador, só na primeira vez
+npm test              # 15 cenários em um Firefox de verdade
 ```
 
-O repositório traz um workflow do GitHub Actions (`.github/workflows/ci.yml`, na raiz) que roda em todo push e pull request, com um job para cada projeto: **backend** (`npm ci`, lint, typecheck e testes) e **frontend** (`npm ci`, lint, build e testes). Os testes do backend usam um MongoDB em memória, então o CI não precisa de serviços extras.
+**Três níveis de teste.** Os testes do backend (Supertest) exercitam a API inteira contra um MongoDB em memória. Os do frontend (Testing Library) renderizam as páginas com uma API simulada. Os de **ponta a ponta** (`e2e/`) ligam tudo de verdade: um Firefox controlado pelo Playwright abre o frontend compilado, que fala com a API real, que grava num MongoDB em memória. Eles conferem o que os outros dois não alcançam: o cookie `HttpOnly` indo e voltando entre o navegador e a API, as rotas protegidas, o arrastar e soltar com o mouse, e os números do `/resumo` calculados pela API e desenhados pelos gráficos. Também pegam divergências entre o que o frontend espera e o que a API devolve. Veja os detalhes em [`e2e/README.md`](e2e/README.md).
+
+O repositório traz um workflow do GitHub Actions (`.github/workflows/ci.yml`, na raiz) que roda em todo push e pull request, com um job para cada nível: **backend** (`npm ci`, lint, typecheck e testes), **frontend** (`npm ci`, lint, build e testes) e **ponta a ponta** (Playwright com Firefox; se falhar, guarda o relatório com capturas de tela como artefato). Nenhum deles precisa de serviços extras, porque o MongoDB roda em memória.
 
 ## Solução de problemas
 

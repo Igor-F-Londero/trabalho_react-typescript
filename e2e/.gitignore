@@ -1,0 +1,6 @@
+node_modules/
+# Saídas de cada execução
+test-results/
+playwright-report/
+# Build do frontend feito só para os testes (aponta para a API de teste)
+.web/
