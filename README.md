@@ -35,11 +35,11 @@ Cada pessoa tem sua conta e vê apenas as próprias tarefas. As tarefas podem se
     <td align="center" width="50%"><b>Criar uma tarefa</b><br><img src="docs/screenshots/04-novo-formulario.png" alt="Formulário de nova tarefa dentro de um grupo"></td>
   </tr>
   <tr>
-    <td align="center"><b>Resumo mensal</b><br><img src="docs/screenshots/03-resumo-mensal.png" alt="Resumo mensal com anel de progresso, números-chave e gráfico de barras por mês"></td>
-    <td align="center"><b>Tema escuro</b><br><img src="docs/screenshots/06-tema-escuro.png" alt="Resumo mensal no tema escuro"></td>
+    <td align="center"><b>Página <code>/resumo</code></b><br><img src="docs/screenshots/03-resumo-mensal.png" alt="Página de resumo mensal com gráfico radial de avanço, números-chave, barras por mês, evolução em áreas e rosca por prioridade"></td>
+    <td align="center"><b>Tema escuro</b><br><img src="docs/screenshots/06-tema-escuro.png" alt="Página de resumo no tema escuro"></td>
   </tr>
   <tr>
-    <td align="center" colspan="2"><b>No celular</b><br><img src="docs/screenshots/05-celular.png" alt="Tela principal em um celular" width="320"></td>
+    <td align="center" colspan="2"><b>No celular</b> (tela principal e página de resumo)<br><img src="docs/screenshots/05-celular.png" alt="Tela principal em um celular" width="300"> <img src="docs/screenshots/08-celular-resumo.png" alt="Página de resumo em um celular, com o gráfico de barras rolado até o mês atual" width="300"></td>
   </tr>
   <tr>
     <td align="center" colspan="2"><b>O que cada botão faz</b> (os botões mostram só o ícone; o nome aparece ao passar o mouse)<br><img src="docs/screenshots/07-icones.png" alt="Legenda dos ícones: novo grupo, novo subgrupo, nova tarefa, editar, excluir, salvar, confirmar, cancelar, desfazer, tentar de novo, como é calculado, tabela detalhada, sair e tema claro/escuro"></td>
@@ -53,7 +53,7 @@ Cada pessoa tem sua conta e vê apenas as próprias tarefas. As tarefas podem se
 **Conta e segurança**
 
 - Cadastro, login e logout, com a sessão mantida por **cookie `HttpOnly`** (o JavaScript do navegador não consegue ler o token).
-- Rotas protegidas: quem não está logado é levado ao login, e quem tem a sessão expirada volta ao login automaticamente.
+- Rotas protegidas (`/` e `/resumo`): quem não está logado é levado ao `/login`, e quem tem a sessão expirada volta ao login automaticamente.
 - Cada usuário só acessa os próprios dados.
 
 **Tarefas e grupos**
@@ -67,7 +67,8 @@ Cada pessoa tem sua conta e vê apenas as próprias tarefas. As tarefas podem se
 
 - Busca por texto (ignora acentos), filtros por status, prioridade e "só atrasadas", e ordenação.
 - Resumo no topo: total de tarefas, concluídas, atrasadas e barra de progresso.
-- **Resumo mensal visual:** um anel com o avanço geral, três números-chave e um **gráfico de barras animado** por mês (pelo prazo), comparando o **% feito** com o **% por importância**, uma média ponderada em que tarefas de prioridade alta valem 3, média 2 e baixa 1. Passe o mouse (ou use o Tab) sobre um mês para ver o detalhe por prioridade; "Como é calculado" e "Tabela detalhada" ficam recolhidos até você pedir.
+- **Página de resumo (`/resumo`):** um gráfico radial com o avanço geral, três números-chave e três gráficos animados do **Recharts**: **barras por mês** (pelo prazo, comparando o **% feito** com o **% por importância**, uma média ponderada em que tarefas de prioridade alta valem 3, média 2 e baixa 1), **evolução** (tarefas do mês × concluídas, em áreas) e uma **rosca por prioridade**. Passe o mouse (ou toque) para ver os valores exatos; "Como é calculado" e "Tabela detalhada" ficam recolhidos até você pedir.
+- **Navegação** por um cabeçalho fixo com as páginas **Tarefas** e **Resumo**, o botão de tema e o de sair.
 
 **Experiência de uso**
 
@@ -80,7 +81,7 @@ Cada pessoa tem sua conta e vê apenas as próprias tarefas. As tarefas podem se
 
 | Camada                 | Tecnologias                                                                                                       |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Frontend**           | React 19, TypeScript, Vite, React Router, TanStack Query (React Query), dnd-kit, CSS puro (gráficos em SVG e CSS) |
+| **Frontend**           | React 19, TypeScript, Vite, React Router, TanStack Query (React Query), dnd-kit, **Tailwind CSS 4**, **Recharts** |
 | **Backend**            | Node.js, Express 5, TypeScript, Mongoose (MongoDB), Zod, JWT, bcryptjs, Helmet, express-rate-limit, Swagger UI    |
 | **Banco**              | MongoDB 7 (via Docker Compose)                                                                                    |
 | **Testes e qualidade** | Vitest, Testing Library, Supertest, mongodb-memory-server, ESLint, oxlint, Prettier, GitHub Actions               |
@@ -168,7 +169,7 @@ Cada projeto traz um arquivo `.env.example` para copiar para `.env`. O `.env` re
 4. **Conclua** uma tarefa marcando a caixinha à esquerda. O progresso no topo e os contadores dos grupos se atualizam na hora.
 5. **Reorganize arrastando** pela alça `⠿`: solte uma tarefa em outro grupo para movê-la, ou na área **"Sem grupo"** para tirá-la do grupo. Grupos também podem ser arrastados para dentro de outros.
 6. **Encontre o que precisa** com a busca, os filtros e a ordenação.
-7. **Abra o Resumo mensal** para ver o anel de avanço geral e o gráfico mês a mês (no celular, o gráfico abre rolado até o mês atual). Passe o mouse sobre um mês para ver o detalhe por prioridade; o botão da **tabela** mostra os números exatos e o do **"i"** explica como os dois percentuais são calculados.
+7. **Abra a página Resumo** (link no cabeçalho, ou direto em `/resumo`) para ver o avanço geral e os gráficos mês a mês: passe o mouse (ou toque) em uma barra para ver o detalhe, o botão da **tabela** mostra os números exatos e o do **"i"** explica como os dois percentuais são calculados. No celular, o gráfico de barras abre rolado até o mês atual. Volte para as tarefas pelo link **Tarefas**.
 8. **Excluiu sem querer?** Toque na **seta de voltar** (_Desfazer_) no aviso que aparece por 6 segundos. A lixeira pede uma confirmação (visto para confirmar, X para desistir).
 9. **Troque o tema** no botão sol/lua do topo (disponível também na tela de login).
 10. **Recolha** grupos com a seta ao lado do nome. A tela lembra quais estavam recolhidos.
@@ -235,11 +236,12 @@ A documentação interativa fica em **http://localhost:3000/docs** (Swagger). Re
 │   └── tests/                     testes automatizados
 └── trabalho_2_frontend/           interface (React + TypeScript)
     └── src/
-        ├── pages/                 telas: LoginPage e DashboardPage
-        ├── components/            componentes reutilizáveis (GrupoItem, TarefaLinha, formulários…)
+        ├── pages/                 telas: LoginPage, DashboardPage (`/`) e ResumoPage (`/resumo`)
+        ├── components/            componentes reutilizáveis (GrupoItem, TarefaLinha, formulários, Cabecalho…)
+        │   └── graficos/          gráficos do Recharts: barras, áreas, rosca e arco de avanço
         ├── hooks/                 lógica de dados e estado (sessão, árvore, avisos, resumo)
         ├── services/              cliente da API (`api.ts`)
-        ├── lib/                   tipos e funções puras (árvore, arrastar e soltar, resumo mensal, tema)
+        ├── lib/                   tipos e funções puras (árvore, arrastar e soltar, resumo mensal, dados dos gráficos, tema)
         └── test-utils/            dados de exemplo compartilhados pelos testes
 ```
 
@@ -252,8 +254,9 @@ O fluxo de uma requisição na API é `rota → autenticação → validação (
 - **React Query com atualização otimista:** a tela responde na hora, e desfaz a mudança se a API recusar.
 - **Desfazer por adiamento:** em vez de recriar o item depois de apagá-lo (o que mudaria seu ID), a exclusão só é enviada à API depois dos 6 segundos. Sair da conta confirma as exclusões pendentes antes.
 - **Média ponderada no resumo mensal:** concluir uma tarefa de prioridade alta pesa mais que uma baixa (pesos 3, 2 e 1, definidos em `PESOS` no `summary.service.ts`).
-- **CSS puro, tema com `light-dark()`:** cada cor é escrita uma vez só, com a versão clara e a escura lado a lado. O botão de tema grava `data-tema` no `<html>` e um pequeno script no `index.html` o aplica antes da primeira pintura, para a página não piscar no tema errado.
-- **Gráfico sem biblioteca:** o anel e as barras são SVG e CSS puros, animados só com CSS (e desligados para quem pede menos movimento). Cada coluna tem uma descrição completa para leitores de tela, e a tabela detalhada continua disponível.
+- **Tailwind CSS 4, com o tema em `light-dark()`:** as cores do projeto são declaradas uma vez só em `@theme` (`src/index.css`), com a versão clara e a escura lado a lado, e viram utilitários (`bg-cartao`, `text-suave`, `border-borda`…). Assim os componentes usam as classes do Tailwind direto no JSX e o tema escuro não precisa de `dark:` em lugar nenhum. O botão de tema grava `data-tema` no `<html>` e um pequeno script no `index.html` o aplica antes da primeira pintura, para a página não piscar no tema errado. O que o Tailwind não cobre (animar a tampa de uma lixeira em SVG) fica em poucas linhas de CSS no mesmo arquivo.
+- **Recharts para os gráficos:** os três gráficos da página de resumo e o arco de avanço usam a mesma paleta do tema (variáveis CSS, então acompanham claro e escuro) e as animações são desligadas para quem pede menos movimento. Cada gráfico é uma imagem com a descrição completa em `aria-label` (todos os meses, por extenso) para leitores de tela, e a tabela detalhada continua disponível. Os dados vêm de funções puras e testadas (`lib/graficos.ts`).
+- **Rotas com React Router:** `/login` é pública; `/` e `/resumo` ficam dentro de uma rota-pai (`AreaLogada`) que faz a guarda de sessão e desenha o cabeçalho, em vez de repetir a verificação em cada página. A página de resumo é carregada sob demanda (`React.lazy`): a biblioteca de gráficos só é baixada quando a pessoa abre `/resumo` (o pacote principal ficou em ~370 kB, contra ~870 kB com tudo junto).
 - **Botões só com ícone, acessíveis:** um único componente (`BotaoIcone`) recebe o ícone e um `rotulo` que descreve a ação exata; ele vira `aria-label` e `title`. As animações ficam no CSS: cada ícone tem as partes que se mexem (tampa, seta, "+") com classe própria, acionadas por `:hover` e `:focus-visible`, e `prefers-reduced-motion` as desliga. A tela de login mantém o texto, porque ali o botão é o próprio formulário.
 - **Dados de demonstração com histórico:** o `seed` gera tarefas em 8 meses ao redor de hoje, sempre relativas à data em que roda (sem sorteios, então o resultado é reproduzível), para o gráfico do resumo mensal aparecer cheio e com valores diferentes a cada mês.
 - **Desenvolvimento orientado a testes:** as funcionalidades novas foram escritas começando pelos testes.
@@ -267,7 +270,7 @@ npm run lint
 npm run typecheck
 
 # Frontend (na pasta trabalho_2_frontend)
-npm test              # 166 testes
+npm test              # 184 testes
 npm run lint
 npm run build         # checa os tipos e gera a versão de produção
 ```

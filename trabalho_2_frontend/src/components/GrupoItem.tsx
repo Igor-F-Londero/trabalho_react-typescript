@@ -8,13 +8,21 @@ import { idDnd, type Arrasto } from '../lib/arrasto';
 import { todasTarefas } from '../lib/arvore';
 import type { GrupoNo } from '../lib/types';
 import ConfirmButton from './ConfirmButton';
+import { ALVO_DE_SOLTAR, BOTAO_SUTIL, DICA, ERRO } from './estilos';
 import BotaoIcone from './BotaoIcone';
 import Icone from './Icone';
 import NomeForm from './NomeForm';
 import TarefaForm from './TarefaForm';
 import ListaTarefas from './ListaTarefas';
 
-export default function GrupoItem({ no, forcarAberto }: { no: GrupoNo; forcarAberto: boolean }) {
+interface Props {
+  no: GrupoNo;
+  forcarAberto: boolean;
+  /** É um subgrupo: fica num tom mais fundo para o aninhamento ser visível. */
+  aninhado?: boolean;
+}
+
+export default function GrupoItem({ no, forcarAberto, aninhado = false }: Props) {
   const acoes = useAcoes();
   const avisar = useToast();
   const [aberto, setAberto] = useGrupoAberto(no._id);
@@ -48,12 +56,12 @@ export default function GrupoItem({ no, forcarAberto }: { no: GrupoNo; forcarAbe
         drag.setNodeRef(el);
         drop.setNodeRef(el);
       }}
-      className={`grupo${drop.isOver ? ' alvo' : ''}${drag.isDragging ? ' arrastando' : ''}`}
+      className={`rounded-lg border border-borda px-3 py-2 max-sm:p-1.5 ${aninhado ? 'mt-2 bg-cartao-sub' : 'bg-cartao shadow-cartao'} ${drop.isOver ? ALVO_DE_SOLTAR : ''} ${drag.isDragging ? 'opacity-40' : ''}`}
     >
-      <div className="grupo-cabecalho">
+      <div className="flex min-h-10 flex-wrap items-center gap-1.5">
         <button
           type="button"
-          className="alca"
+          className={`${BOTAO_SUTIL} cursor-grab touch-none active:cursor-grabbing`}
           aria-label={`Arrastar grupo ${no.nome}`}
           title="Arraste para dentro de outro grupo"
           {...drag.attributes}
@@ -64,7 +72,7 @@ export default function GrupoItem({ no, forcarAberto }: { no: GrupoNo; forcarAbe
         {!forcarAberto && (
           <button
             type="button"
-            className="seta"
+            className={`${BOTAO_SUTIL} [&[aria-expanded=true]_.icone]:rotate-90`}
             aria-expanded={mostrar}
             aria-label={`${mostrar ? 'Recolher' : 'Abrir'} ${no.nome}`}
             title={`${mostrar ? 'Recolher' : 'Abrir'} ${no.nome}`}
@@ -85,20 +93,24 @@ export default function GrupoItem({ no, forcarAberto }: { no: GrupoNo; forcarAbe
           />
         ) : (
           <>
-            <span className="icone-grupo"><Icone nome="pastaSimples" /></span>
-            <strong>{no.nome}</strong>
+            <span className="inline-flex text-suave"><Icone nome="pastaSimples" /></span>
+            <strong className="font-semibold">{no.nome}</strong>
           </>
         )}
-        {tarefas.length > 0 && <span className="contador">{feitas}/{tarefas.length}</span>}
-        <span className="acoes">
-          <BotaoIcone icone="tarefaMais" rotulo={`Nova tarefa em ${no.nome}`} className="link" onClick={() => { setAberto(true); setCriandoTarefa(true); }} />
-          <BotaoIcone icone="subpasta" rotulo={`Novo subgrupo em ${no.nome}`} className="link" onClick={() => { setAberto(true); setCriandoSub(true); }} />
-          <BotaoIcone icone="lapis" rotulo={`Renomear ${no.nome}`} className="link" onClick={() => setRenomeando(true)} />
+        {tarefas.length > 0 && (
+          <span className={`rounded-full border border-borda px-2 text-xs text-suave ${aninhado ? 'bg-cartao' : 'bg-cartao-sub'}`}>
+            {feitas}/{tarefas.length}
+          </span>
+        )}
+        <span className="ml-auto flex flex-wrap items-center gap-0.5 max-sm:ml-0 max-sm:w-full">
+          <BotaoIcone icone="tarefaMais" rotulo={`Nova tarefa em ${no.nome}`} variante="discreto" onClick={() => { setAberto(true); setCriandoTarefa(true); }} />
+          <BotaoIcone icone="subpasta" rotulo={`Novo subgrupo em ${no.nome}`} variante="discreto" onClick={() => { setAberto(true); setCriandoSub(true); }} />
+          <BotaoIcone icone="lapis" rotulo={`Renomear ${no.nome}`} variante="discreto" onClick={() => setRenomeando(true)} />
           {excluirTudo ? (
-            <span className="linha">
-              <span className="erro">Tem conteúdo. Excluir tudo?</span>
-              <BotaoIcone icone="lixeira" rotulo={`Excluir ${no.nome} e todo o conteúdo`} className="perigo-solido" onClick={excluirCascata} />
-              <BotaoIcone icone="x" rotulo="Cancelar exclusão" className="link" onClick={() => setExcluirTudo(false)} />
+            <span className="flex flex-wrap items-center gap-1.5">
+              <span className={ERRO}>Tem conteúdo. Excluir tudo?</span>
+              <BotaoIcone icone="lixeira" rotulo={`Excluir ${no.nome} e todo o conteúdo`} variante="perigo-solido" onClick={excluirCascata} />
+              <BotaoIcone icone="x" rotulo="Cancelar exclusão" variante="discreto" onClick={() => setExcluirTudo(false)} />
             </span>
           ) : (
             <ConfirmButton onConfirmar={excluir} rotulo={`Excluir ${no.nome}`} />
@@ -107,7 +119,7 @@ export default function GrupoItem({ no, forcarAberto }: { no: GrupoNo; forcarAbe
       </div>
 
       {mostrar && (
-        <div className="grupo-corpo">
+        <div className="my-1 ml-4 border-l-2 border-borda pl-3 max-sm:ml-0 max-sm:pl-1.5">
           {criandoSub && (
             <NomeForm
               rotulo="Nome do subgrupo"
@@ -128,12 +140,12 @@ export default function GrupoItem({ no, forcarAberto }: { no: GrupoNo; forcarAbe
             />
           )}
           {!no.tarefas.length && !no.subgrupos.length && !criandoTarefa && !criandoSub && (
-            <p className="dica">Grupo vazio</p>
+            <p className={DICA}>Grupo vazio</p>
           )}
           <ul>
             <ListaTarefas tarefas={no.tarefas} />
             {no.subgrupos.map((sub) => (
-              <GrupoItem key={sub._id} no={sub} forcarAberto={forcarAberto} />
+              <GrupoItem key={sub._id} no={sub} forcarAberto={forcarAberto} aninhado />
             ))}
           </ul>
         </div>

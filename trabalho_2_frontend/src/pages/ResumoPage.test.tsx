@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resumoDeTeste } from '../test-utils/resumoMensal';
-import ResumoMensal from './ResumoMensal';
+import ResumoPage from './ResumoPage';
 
 const json = (status: number, corpo: unknown) =>
   new Response(JSON.stringify(corpo), { status, headers: { 'Content-Type': 'application/json' } });
@@ -25,31 +25,29 @@ function montar() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={client}>
-      <ResumoMensal />
+      <ResumoPage />
     </QueryClientProvider>,
   );
 }
 
-const abrir = () => userEvent.click(screen.getByRole('button', { name: /Resumo mensal/ }));
-
-describe('ResumoMensal', () => {
-  it('começa recolhido e não busca nada até ser aberto', () => {
+describe('ResumoPage', () => {
+  it('é uma página própria: já abre buscando o resumo, sem nada para expandir', async () => {
     montar();
-    expect(screen.getByRole('button', { name: /Resumo mensal/ })).toHaveAttribute('aria-expanded', 'false');
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it('ao abrir, busca o resumo e mostra o anel com o avanço geral por importância', async () => {
-    montar();
-    await abrir();
-    const anel = await screen.findByRole('img', { name: /35%.*importância/ });
-    expect(anel).toHaveAccessibleName(/31,6%/);
+    expect(screen.getByRole('heading', { level: 1, name: 'Resumo mensal' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Carregando');
+    await screen.findByRole('img', { name: /Conclusão por mês/ });
     expect(String(fetchMock.mock.calls[0][0])).toMatch(/\/tarefas\/resumo-mensal$/);
+    expect(screen.queryByRole('button', { name: /Resumo mensal/ })).not.toBeInTheDocument();
   });
 
-  it('resume os números em cartões, sem parágrafos', async () => {
+  it('mostra o avanço geral por importância em um gráfico radial', async () => {
     montar();
-    await abrir();
+    const radial = await screen.findByRole('img', { name: /35%.*importância/ });
+    expect(radial).toHaveAccessibleName(/31,6%/);
+  });
+
+  it('resume os números em cartões', async () => {
+    montar();
     const cartoes = await screen.findByLabelText('Resumo em números');
     expect(cartoes).toHaveTextContent('6/19');
     expect(cartoes).toHaveTextContent('tarefas concluídas');
@@ -59,17 +57,19 @@ describe('ResumoMensal', () => {
     expect(cartoes).toHaveTextContent('concluídas por mês');
   });
 
-  it('mostra o gráfico de barras com um mês por coluna', async () => {
+  it('traz os três gráficos: conclusão por mês, evolução e prioridades', async () => {
     montar();
-    await abrir();
-    const grafico = await screen.findByRole('list', { name: 'Conclusão por mês' });
-    expect(grafico.querySelectorAll('li')).toHaveLength(2);
+    expect(await screen.findByRole('img', { name: /^Conclusão por mês/ })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /^Evolução das tarefas por mês/ })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /^Tarefas por prioridade/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Conclusão por mês' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Evolução' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Por prioridade' })).toBeInTheDocument();
   });
 
   it('esconde a explicação e a tabela até o usuário pedir', async () => {
     montar();
-    await abrir();
-    await screen.findByRole('list', { name: 'Conclusão por mês' });
+    await screen.findByRole('img', { name: /^Conclusão por mês/ });
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.queryByText(/alta vale 3, média 2 e baixa 1/)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Tabela detalhada' })).toHaveAttribute('aria-expanded', 'false');
@@ -78,7 +78,6 @@ describe('ResumoMensal', () => {
 
   it('os botões de explicação e de tabela mostram só o ícone (i e tabela), sem texto', async () => {
     montar();
-    await abrir();
     const como = await screen.findByRole('button', { name: 'Como é calculado' });
     const tabela = screen.getByRole('button', { name: 'Tabela detalhada' });
     expect(como.textContent).toBe('');
@@ -91,7 +90,6 @@ describe('ResumoMensal', () => {
 
   it('"Como é calculado" explica os dois percentuais e os pesos', async () => {
     montar();
-    await abrir();
     await userEvent.click(await screen.findByRole('button', { name: 'Como é calculado' }));
     expect(screen.getByText(/alta vale 3, média 2 e baixa 1/)).toBeInTheDocument();
     expect(screen.getByText(/tarefas concluídas ÷ tarefas do mês/)).toBeInTheDocument();
@@ -100,7 +98,6 @@ describe('ResumoMensal', () => {
 
   it('"Tabela detalhada" mostra e esconde a tabela com os números exatos', async () => {
     montar();
-    await abrir();
     const botao = await screen.findByRole('button', { name: 'Tabela detalhada' });
     await userEvent.click(botao);
     expect(screen.getByRole('table')).toHaveTextContent('outubro de 2026');
@@ -109,35 +106,23 @@ describe('ResumoMensal', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  it('avisa, sem precisar abrir nada, quantas tarefas ficaram de fora por não terem prazo', async () => {
+  it('avisa quantas tarefas ficaram de fora por não terem prazo', async () => {
     montar();
-    await abrir();
     expect(await screen.findByText(/5 tarefas sem prazo não entram no resumo/)).toBeInTheDocument();
   });
 
-  it('sem nenhuma tarefa com prazo, explica o motivo em vez de mostrar um gráfico vazio', async () => {
+  it('sem nenhuma tarefa com prazo, explica o motivo em vez de mostrar gráficos vazios', async () => {
     fetchMock.mockResolvedValue(
       json(200, { ...resumoDeTeste, meses: [], geral: { ...resumoDeTeste.geral, total: 0, semPrazo: 0 } }),
     );
     montar();
-    await abrir();
     expect(await screen.findByText(/Nenhuma tarefa com prazo ainda/)).toBeInTheDocument();
-    expect(screen.queryByRole('list', { name: 'Conclusão por mês' })).not.toBeInTheDocument();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('avisa quando não consegue carregar', async () => {
     fetchMock.mockResolvedValue(json(500, { erro: 'Falha' }));
     montar();
-    await abrir();
     expect(await screen.findByRole('alert')).toHaveTextContent(/Falha/);
-  });
-
-  it('recolher esconde todo o conteúdo', async () => {
-    montar();
-    await abrir();
-    await screen.findByRole('list', { name: 'Conclusão por mês' });
-    await abrir();
-    expect(screen.queryByRole('list', { name: 'Conclusão por mês' })).not.toBeInTheDocument();
   });
 });

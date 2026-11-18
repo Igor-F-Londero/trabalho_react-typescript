@@ -10,7 +10,7 @@ export default function AlternarTema() {
     <BotaoIcone
       icone={paraEscuro ? 'lua' : 'sol'}
       rotulo={paraEscuro ? 'Mudar para o tema escuro' : 'Mudar para o tema claro'}
-      className="link"
+      variante="discreto"
       onClick={alternar}
     />
   );

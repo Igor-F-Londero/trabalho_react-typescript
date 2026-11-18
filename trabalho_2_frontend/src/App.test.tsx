@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
@@ -331,32 +331,70 @@ describe('Desfazer exclusão', () => {
   });
 });
 
-describe('Resumo mensal no dashboard', () => {
-  it('aparece recolhido e abre mostrando os meses', async () => {
+describe('Navegação e página de resumo mensal', () => {
+  it('o cabeçalho leva do dashboard ao resumo e de volta, marcando a página atual', async () => {
     simularServidor(true, arvoreComGrupo);
     render(<App />);
-    const botao = await screen.findByRole('button', { name: /Resumo mensal/ });
-    expect(botao).toHaveAttribute('aria-expanded', 'false');
-    await userEvent.click(botao);
-    expect(await screen.findByRole('listitem', { name: /outubro de 2026/ })).toBeInTheDocument();
+    const nav = await screen.findByRole('navigation', { name: 'Principal' });
+    expect(within(nav).getByRole('link', { name: 'Tarefas' })).toHaveAttribute('aria-current', 'page');
+    expect(within(nav).getByRole('link', { name: 'Resumo' })).not.toHaveAttribute('aria-current');
+
+    await userEvent.click(within(nav).getByRole('link', { name: 'Resumo' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Resumo mensal' })).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/resumo');
+    expect(within(nav).getByRole('link', { name: 'Resumo' })).toHaveAttribute('aria-current', 'page');
+    expect(within(nav).getByRole('link', { name: 'Tarefas' })).not.toHaveAttribute('aria-current');
+
+    await userEvent.click(within(nav).getByRole('link', { name: 'Tarefas' }));
+    expect(await screen.findByRole('heading', { name: 'Minhas tarefas' })).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/');
   });
 
-  it('não aparece enquanto o usuário não tem nenhum dado', async () => {
-    simularServidor(true);
+  it('abrir /resumo direto, com sessão, mostra os gráficos do mês', async () => {
+    window.history.pushState({}, '', '/resumo');
+    simularServidor(true, arvoreComGrupo);
     render(<App />);
-    await screen.findByText('Você ainda não tem grupos');
+    expect(await screen.findByRole('img', { name: /outubro de 2026/ })).toBeInTheDocument();
+  });
+
+  it('/resumo é protegida: sem sessão, leva ao login', async () => {
+    window.history.pushState({}, '', '/resumo');
+    simularServidor(false);
+    render(<App />);
+    expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/login');
+  });
+
+  it('o dashboard não carrega o resumo: ele só é buscado na própria página', async () => {
+    const chamadas = simularServidor(true, arvoreComGrupo);
+    render(<App />);
+    await screen.findByText('Estudar hooks');
+    expect(chamadas).not.toContain('GET /tarefas/resumo-mensal');
     expect(screen.queryByRole('button', { name: /Resumo mensal/ })).not.toBeInTheDocument();
   });
 
-  it('se atualiza depois que uma tarefa muda', async () => {
+  it('sair funciona também a partir do resumo', async () => {
+    window.history.pushState({}, '', '/resumo');
+    const chamadas = simularServidor(true);
+    render(<App />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Sair da conta' }));
+    expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument();
+    expect(chamadas).toContain('POST /auth/logout');
+  });
+
+  it('o resumo se atualiza depois que uma tarefa muda no dashboard', async () => {
     const chamadas = simularServidor(true, arvoreComGrupo);
     render(<App />);
-    await userEvent.click(await screen.findByRole('button', { name: /Resumo mensal/ }));
-    await screen.findByRole('listitem', { name: /outubro de 2026/ });
+    const nav = await screen.findByRole('navigation', { name: 'Principal' });
     const buscas = () => chamadas.filter((c) => c === 'GET /tarefas/resumo-mensal').length;
+
+    await userEvent.click(within(nav).getByRole('link', { name: 'Resumo' }));
+    await screen.findByRole('img', { name: /outubro de 2026/ });
     expect(buscas()).toBe(1);
 
-    await userEvent.click(screen.getByLabelText('Concluir Estudar hooks'));
+    await userEvent.click(within(nav).getByRole('link', { name: 'Tarefas' }));
+    await userEvent.click(await screen.findByLabelText('Concluir Estudar hooks'));
+    await userEvent.click(within(nav).getByRole('link', { name: 'Resumo' }));
     await vi.waitFor(() => expect(buscas()).toBe(2));
   });
 });
@@ -495,6 +533,13 @@ describe('Alternador de tema', () => {
   });
 
   it('aparece no dashboard', async () => {
+    simularServidor(true, arvoreComGrupo);
+    render(<App />);
+    expect(await screen.findByRole('button', { name: /Mudar para o tema/ })).toBeInTheDocument();
+  });
+
+  it('aparece também na página de resumo', async () => {
+    window.history.pushState({}, '', '/resumo');
     simularServidor(true, arvoreComGrupo);
     render(<App />);
     expect(await screen.findByRole('button', { name: /Mudar para o tema/ })).toBeInTheDocument();

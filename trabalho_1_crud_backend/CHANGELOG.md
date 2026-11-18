@@ -1,6 +1,6 @@
 # Registro de alterações por categoria
 
-Resumo do que compõe o projeto **API de Tarefas e Grupos** (Express 5 + MongoDB/Mongoose + Zod + JWT em cookie) e o frontend que a consome, organizado por categoria. O repositório git (na raiz do projeto) ainda não tem commits, então este registro foi montado a partir do estado atual do código, do `roadmap.md` e do `README.md`, e não do histórico de commits.
+Resumo do que compõe o projeto **API de Tarefas e Grupos** (Express 5 + MongoDB/Mongoose + Zod + JWT em cookie) e o frontend que a consome, organizado por categoria. Este registro foi montado a partir do estado do código, do `roadmap.md` e do `README.md`, e não do histórico de commits.
 
 ## Infraestrutura (infra)
 
@@ -118,6 +118,15 @@ Resumo do que compõe o projeto **API de Tarefas e Grupos** (Express 5 + MongoDB
 
 1. **Defeito:** o limitador estava em todas as rotas de `/auth`, inclusive `GET /auth/me`, que o frontend chama a cada carregamento de página (desde que a sessão passou a ser por cookie). Bastavam 20 recargas em 15 minutos para a API responder 429 ("Muitas tentativas"), a tela cair no login e o próprio login também ser bloqueado. Apareceu durante a conferência visual, que fez vários logins seguidos, mas atingiria qualquer usuário.
 2. **Correção:** o limite passou para `POST /auth/login` e `POST /auth/register` (que dividem a mesma cota); `/me` e `/logout` ficaram fora. `criarAuthLimiter` e `criarAuthRoutes` recebem o limite como parâmetro para o teste poder exercitá-lo de verdade, já que o limite padrão fica desligado em `NODE_ENV=test`. Escrito antes com TDD (`tests/ratelimit.test.ts`: 429 depois do limite, cadastro dividindo a cota, `/me` e `/logout` sem contar). Backend: 89 testes (eram 84).
+
+## Página /resumo, Tailwind e Recharts — concluído
+
+1. **Página `/resumo`:** o resumo mensal deixou de ser um bloco recolhido no dashboard e virou uma página própria (`ResumoPage`), com cabeçalho de navegação (`Cabecalho`: Tarefas, Resumo, tema e sair). As rotas `/` e `/resumo` ficam dentro de `AreaLogada`, rota-pai que faz a guarda de sessão (sem login, vai para `/login`) e usa `<Outlet />`. A página é carregada com `React.lazy`.
+2. **Gráficos com Recharts:** o gráfico de barras e o anel feitos à mão em SVG/CSS foram substituídos por `GraficoConclusao` (barras agrupadas, com dica ao passar o mouse e rolagem até o mês atual no celular), `GraficoEvolucao` (áreas), `GraficoPrioridades` (rosca) e `AvancoGeral` (arco radial). As cores vêm das variáveis do tema, então acompanham claro e escuro; a animação respeita `prefers-reduced-motion`. Cada gráfico é uma imagem descrita por extenso em `aria-label`. Os dados saem de funções puras em `lib/graficos.ts`.
+3. **Tailwind CSS 4:** `src/index.css` caiu de ~300 linhas de CSS próprio para o `@theme` (cores `light-dark()`), a base dos campos e as animações dos ícones SVG; o resto virou classes no JSX. Novos componentes `Botao` (variantes `primario`, `discreto`, `perigo`, `perigo-solido`), `Etiqueta` e constantes de estilo compartilhadas (`estilos.ts`). `BotaoIcone` agora recebe `variante` (e `grande`) no lugar das classes `link`/`perigo-solido`.
+4. **TDD:** os testes dos gráficos, da página e das rotas foram escritos antes (viram vermelhos por módulos inexistentes) e só depois implementados. Saíram `AnelProgresso`, `GraficoMensal` e `ResumoMensal` com seus testes. Frontend: 184 testes (eram 166).
+5. **Verificação no Firefox real:** fluxo completo (cadastro, grupo, tarefa, concluir, arrastar e soltar, excluir e desfazer, `/resumo`, recarregar e sair) contra a API real, em desktop claro, escuro e celular. Achados só ali: o `hover:` do Tailwind 4 só vale em dispositivos com `(hover: hover)` (o Firefox headless não declara isso, então foi preciso forçar a preferência para ver os botões subirem); a dica dos gráficos capitalizava "De" em "Novembro De 2026"; e o cabeçalho translúcido deixava o conteúdo aparecer por trás.
+6. Prints do README refeitos, mais uma captura da página de resumo no celular.
 
 ## Refatoração (etapa azul do TDD) — concluída
 

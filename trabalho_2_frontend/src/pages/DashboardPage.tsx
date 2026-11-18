@@ -11,27 +11,29 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core';
 import { useMemo, useState } from 'react';
+import { ALVO_DE_SOLTAR, CARTAO, DICA, ERRO, TITULO_SECAO } from '../components/estilos';
 import Filtros from '../components/Filtros';
-import AlternarTema from '../components/AlternarTema';
 import BotaoIcone from '../components/BotaoIcone';
 import GrupoItem from '../components/GrupoItem';
 import ListaTarefas from '../components/ListaTarefas';
 import NomeForm from '../components/NomeForm';
 import Resumo from '../components/Resumo';
-import ResumoMensal from '../components/ResumoMensal';
 import TarefaForm from '../components/TarefaForm';
 import { useAcoes, useArvore } from '../hooks/useArvore';
-import { useSair, useSessao } from '../hooks/useSessao';
+import { useSessao } from '../hooks/useSessao';
 import { RAIZ, decidirMovimento, type Arrasto } from '../lib/arrasto';
 import { FILTRO_VAZIO, acharGrupo, achatarArvore, filtroAtivo, filtrarArvore, type Filtro } from '../lib/arvore';
 
 function ZonaRaiz({ arrastando, children }: { arrastando: boolean; children?: React.ReactNode }) {
   const { setNodeRef, isOver } = useDroppable({ id: RAIZ });
   return (
-    <section ref={setNodeRef} className={`raiz${isOver ? ' alvo' : ''}`}>
-      <h2>Sem grupo</h2>
+    <section
+      ref={setNodeRef}
+      className={`mt-4 rounded-lg border-2 border-dashed border-borda p-3 ${isOver ? ALVO_DE_SOLTAR : ''}`}
+    >
+      <h2 className={TITULO_SECAO}>Sem grupo</h2>
       {children}
-      {arrastando && <p className="dica">Solte aqui para tirar do grupo</p>}
+      {arrastando && <p className={DICA}>Solte aqui para tirar do grupo</p>}
     </section>
   );
 }
@@ -39,7 +41,6 @@ function ZonaRaiz({ arrastando, children }: { arrastando: boolean; children?: Re
 export default function DashboardPage() {
   const { data: arvore, error, isPending, refetch } = useArvore();
   const acoes = useAcoes();
-  const sair = useSair();
   const { data: usuario } = useSessao();
 
   const [filtro, setFiltro] = useState<Filtro>(FILTRO_VAZIO);
@@ -53,11 +54,11 @@ export default function DashboardPage() {
   );
   const visivel = useMemo(() => (arvore ? filtrarArvore(arvore, filtro) : null), [arvore, filtro]);
 
-  if (isPending) return <p className="card" role="status">Carregando…</p>;
+  if (isPending) return <p className={CARTAO} role="status">Carregando…</p>;
   if (error || !arvore || !visivel) {
     return (
-      <div className="card">
-        <p className="erro" role="alert">{error?.message ?? 'Erro ao carregar'}</p>
+      <div className={`${CARTAO} flex flex-col items-start gap-3`}>
+        <p className={ERRO} role="alert">{error?.message ?? 'Erro ao carregar'}</p>
         <BotaoIcone icone="recarregar" rotulo="Tentar de novo" onClick={() => refetch()} />
       </div>
     );
@@ -86,33 +87,30 @@ export default function DashboardPage() {
   const semDados = !arvore.grupos.length && !arvore.tarefasSemGrupo.length;
 
   return (
-    <div className="dashboard">
-      <header className="topo">
+    <div>
+      <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1>Minhas tarefas</h1>
-          {usuario && <p className="saudacao">Olá, {usuario.nome}</p>}
+          <h1 className="text-2xl font-semibold">Minhas tarefas</h1>
+          {usuario && <p className="text-sm text-suave">Olá, {usuario.nome}</p>}
         </div>
-        <div className="topo-acoes">
-          <AlternarTema />
+        <div className="flex flex-wrap gap-1.5 *:animate-pop [&>:nth-child(2)]:[animation-delay:.06s]">
           <BotaoIcone icone="pasta" rotulo="Novo grupo" onClick={() => setCriandoGrupo(true)} />
           <BotaoIcone icone="tarefaMais" rotulo="Nova tarefa sem grupo" onClick={() => setCriandoTarefa(true)} />
-          <BotaoIcone icone="sair" rotulo="Sair da conta" className="link" onClick={sair} />
         </div>
       </header>
 
       <Resumo arvore={arvore} />
       {!semDados && (
         <>
-          <ResumoMensal />
           <Filtros filtro={filtro} onChange={setFiltro} />
-          <p className="dica">
+          <p className={DICA}>
             Arraste uma tarefa para dentro de um grupo para organizá-la (ou para "Sem grupo" para soltá-la).
           </p>
         </>
       )}
 
       {criandoGrupo && (
-        <div className="card form-topo">
+        <div className={`${CARTAO} mb-3`}>
           <NomeForm
             rotulo="Nome do grupo (ex.: Faculdade)"
             onCancelar={() => setCriandoGrupo(false)}
@@ -125,7 +123,7 @@ export default function DashboardPage() {
       )}
 
       {criandoTarefa && (
-        <div className="card form-topo">
+        <div className={`${CARTAO} mb-3`}>
           <TarefaForm
             onCancelar={() => setCriandoTarefa(false)}
             onSalvar={async (d) => {
@@ -143,7 +141,7 @@ export default function DashboardPage() {
         onDragEnd={aoSoltar}
         onDragCancel={() => setAtivo(null)}
       >
-        <ul className="arvore">
+        <ul className="mt-2 flex flex-col gap-3">
           {visivel.grupos.map((g) => (
             <GrupoItem key={g._id} no={g} forcarAberto={filtrando} />
           ))}
@@ -157,17 +155,17 @@ export default function DashboardPage() {
           </ZonaRaiz>
         )}
 
-        <DragOverlay>{nomeAtivo && <div className="overlay">{nomeAtivo}</div>}</DragOverlay>
+        <DragOverlay>{nomeAtivo && <div className="w-max max-w-[80vw] rounded-md border border-primaria bg-cartao px-3.5 py-2 shadow-lg">{nomeAtivo}</div>}</DragOverlay>
       </DndContext>
 
       {semDados && (
-        <div className="card estado-vazio">
-          <p className="estado-vazio-titulo">Você ainda não tem grupos</p>
-          <p className="dica">Crie um grupo (ex.: Faculdade) e organize suas tarefas dentro dele.</p>
-          <BotaoIcone icone="pasta" rotulo="Criar primeiro grupo" onClick={() => setCriandoGrupo(true)} />
+        <div className={`${CARTAO} mt-4 flex flex-col items-center gap-2 px-4 py-10 text-center`}>
+          <p className="text-lg font-semibold">Você ainda não tem grupos</p>
+          <p className={DICA}>Crie um grupo (ex.: Faculdade) e organize suas tarefas dentro dele.</p>
+          <BotaoIcone icone="pasta" rotulo="Criar primeiro grupo" grande className="mt-2" onClick={() => setCriandoGrupo(true)} />
         </div>
       )}
-      {!semDados && semResultados && filtrando && <p className="vazio">Nenhuma tarefa corresponde aos filtros.</p>}
+      {!semDados && semResultados && filtrando && <p className="mt-12 text-center text-suave">Nenhuma tarefa corresponde aos filtros.</p>}
     </div>
   );
 }

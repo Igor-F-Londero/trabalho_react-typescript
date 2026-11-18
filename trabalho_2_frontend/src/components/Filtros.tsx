@@ -11,8 +11,9 @@ export default function Filtros({ filtro, onChange }: Props) {
   const set = <K extends keyof Filtro>(k: K, v: Filtro[K]) => onChange({ ...filtro, [k]: v });
 
   return (
-    <div className="filtros" role="search">
+    <div className="mb-2 flex flex-wrap items-center gap-2" role="search">
       <input
+        className="min-w-0 flex-[1_1_200px]"
         type="search"
         placeholder="Buscar tarefas…"
         aria-label="Buscar tarefas"
@@ -33,12 +34,12 @@ export default function Filtros({ filtro, onChange }: Props) {
         <option value="prioridade">Por prioridade</option>
         <option value="titulo">Por título</option>
       </select>
-      <label className="check">
+      <label className="flex cursor-pointer items-center gap-1.5 text-sm text-suave">
         <input type="checkbox" checked={filtro.atrasadas} onChange={(e) => set('atrasadas', e.target.checked)} />
         Só atrasadas
       </label>
       {(filtroAtivo(filtro) || filtro.ordenacao !== 'padrao') && (
-        <BotaoIcone icone="x" rotulo="Limpar filtros" className="link" onClick={() => onChange(FILTRO_VAZIO)} />
+        <BotaoIcone icone="x" rotulo="Limpar filtros" variante="discreto" onClick={() => onChange(FILTRO_VAZIO)} />
       )}
     </div>
   );

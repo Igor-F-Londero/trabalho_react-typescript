@@ -13,16 +13,23 @@ export default function NomeForm({ rotulo, inicial = '', onSalvar, onCancelar }:
 
   return (
     <form
-      className="linha nome-form"
+      className="my-1.5 flex flex-wrap items-center gap-1.5 [&>button]:animate-pop [&>button:nth-of-type(2)]:[animation-delay:.06s]"
       onKeyDown={(e) => e.key === 'Escape' && onCancelar()}
       onSubmit={(e) => {
         e.preventDefault();
         if (nome.trim()) onSalvar(nome.trim());
       }}
     >
-      <input placeholder={rotulo} aria-label={rotulo} value={nome} onChange={(e) => setNome(e.target.value)} autoFocus />
+      <input
+        className="min-w-0 flex-[1_1_180px]"
+        placeholder={rotulo}
+        aria-label={rotulo}
+        value={nome}
+        onChange={(e) => setNome(e.target.value)}
+        autoFocus
+      />
       <BotaoIcone icone="salvar" rotulo="Salvar" type="submit" />
-      <BotaoIcone icone="x" rotulo="Cancelar" className="link" onClick={onCancelar} />
+      <BotaoIcone icone="x" rotulo="Cancelar" variante="discreto" onClick={onCancelar} />
     </form>
   );
 }

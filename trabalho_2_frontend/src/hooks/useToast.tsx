@@ -45,15 +45,18 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={avisar}>
       {children}
-      <div className="toasts" role="status" aria-live="polite">
+      <div className="fixed right-4 bottom-4 z-50 flex max-w-[min(360px,calc(100vw-32px))] flex-col gap-2" role="status" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className={`toast ${t.tipo}`}>
+          <div
+            key={t.id}
+            className={`flex animate-subir items-center justify-between gap-3 rounded-md border border-l-4 border-borda bg-cartao px-3.5 py-2.5 text-sm shadow-lg ${t.tipo === 'ok' ? 'border-l-sucesso' : 'border-l-perigo'}`}
+          >
             <span>{t.texto}</span>
             {t.acao && (
               <BotaoIcone
                 icone={t.acao.icone}
                 rotulo={t.acao.rotulo}
-                className="link"
+                variante="discreto"
                 onClick={() => {
                   t.acao?.aoClicar();
                   fechar(t.id);

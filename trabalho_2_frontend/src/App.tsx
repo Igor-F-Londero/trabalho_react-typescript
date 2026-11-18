@@ -1,11 +1,16 @@
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState } from 'react';
+import { lazy, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { ToastProvider } from './hooks/useToast';
 import { encerrarSessaoLocal, useSessao } from './hooks/useSessao';
 import { ApiError } from './services/api';
+import AreaLogada from './components/AreaLogada';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
+
+
+// A biblioteca de gráficos é pesada: só baixa quando a pessoa abre o resumo.
+const ResumoPage = lazy(() => import('./pages/ResumoPage'));
 
 function criarClient() {
   // Sessão expirada em qualquer requisição: zera a sessão e a guarda de rota leva ao login.
@@ -32,7 +37,11 @@ function Rotas() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={logado ? <Navigate to="/" replace /> : <LoginPage />} />
-        <Route path="/" element={logado ? <DashboardPage /> : <Navigate to="/login" replace />} />
+        {/* Tudo o que exige login fica dentro de AreaLogada, que faz a guarda e desenha o cabeçalho. */}
+        <Route element={<AreaLogada />}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/resumo" element={<ResumoPage />} />
+        </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
