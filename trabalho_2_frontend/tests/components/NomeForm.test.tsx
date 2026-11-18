@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import NomeForm from './NomeForm';
+import NomeForm from '../../src/components/NomeForm';
 
 describe('NomeForm', () => {
   it('Enter salva e Esc cancela', async () => {

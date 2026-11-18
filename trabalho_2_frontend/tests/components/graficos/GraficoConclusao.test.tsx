@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { MesResumo } from '../../lib/types';
-import { resumoDeTeste } from '../../test-utils/resumoMensal';
-import GraficoConclusao from './GraficoConclusao';
+import type { MesResumo } from '../../../src/lib/types';
+import { resumoDeTeste } from '../../helpers/resumoMensal';
+import GraficoConclusao from '../../../src/components/graficos/GraficoConclusao';
 
 const hoje = new Date(2026, 9, 15); // 15/10/2026: outubro é o mês atual e novembro ainda não começou
 const montar = (meses = resumoDeTeste.meses, quando = hoje) =>

@@ -1,8 +1,8 @@
 import { DndContext } from '@dnd-kit/core';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import type { Tarefa } from '../lib/types';
-import TarefaLinha from './TarefaLinha';
+import type { Tarefa } from '../../src/lib/types';
+import TarefaLinha from '../../src/components/TarefaLinha';
 
 const tarefa: Tarefa = { _id: '1', titulo: 'Ligar para a vovó', status: 'pendente', prioridade: 'media', grupo: null };
 

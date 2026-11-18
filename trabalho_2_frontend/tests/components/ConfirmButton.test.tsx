@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import ConfirmButton from './ConfirmButton';
+import ConfirmButton from '../../src/components/ConfirmButton';
 
 describe('ConfirmButton', () => {
   it('só confirma no segundo clique', async () => {

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import AvancoGeral from './AvancoGeral';
+import AvancoGeral from '../../../src/components/graficos/AvancoGeral';
 
 describe('AvancoGeral', () => {
   it('mostra o percentual no centro e descreve o valor para leitores de tela', () => {

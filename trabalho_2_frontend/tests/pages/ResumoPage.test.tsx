@@ -2,8 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { resumoDeTeste } from '../test-utils/resumoMensal';
-import ResumoPage from './ResumoPage';
+import { resumoDeTeste } from '../helpers/resumoMensal';
+import ResumoPage from '../../src/pages/ResumoPage';
 
 const json = (status: number, corpo: unknown) =>
   new Response(JSON.stringify(corpo), { status, headers: { 'Content-Type': 'application/json' } });

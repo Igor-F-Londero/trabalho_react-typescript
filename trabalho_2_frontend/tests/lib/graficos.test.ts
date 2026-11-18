@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resumoDeTeste } from '../test-utils/resumoMensal';
+import { resumoDeTeste } from '../helpers/resumoMensal';
 import {
   dadosConclusao,
   dadosEvolucao,
@@ -9,7 +9,7 @@ import {
   descreverPrioridades,
   descreverResumo,
   indiceDoMesEmDestaque,
-} from './graficos';
+} from '../../src/lib/graficos';
 
 const hoje = new Date(2026, 9, 15); // 15/10/2026: outubro é o mês atual e novembro ainda não começou
 const { meses } = resumoDeTeste;

@@ -1,8 +1,8 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import App from './App';
-import { cancelarPendentes } from './lib/exclusoes';
+import App from '../src/App';
+import { cancelarPendentes } from '../src/lib/exclusoes';
 
 const usuario = { id: '1', nome: 'Maria', email: 'maria@email.com' };
 const json = (status: number, corpo: unknown) =>

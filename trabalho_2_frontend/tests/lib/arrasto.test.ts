@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { decidirMovimento, idDnd } from './arrasto';
-import type { Arvore, Tarefa } from './types';
+import { decidirMovimento, idDnd } from '../../src/lib/arrasto';
+import type { Arvore, Tarefa } from '../../src/lib/types';
 
 const t = (id: string): Tarefa => ({ _id: id, titulo: id, status: 'pendente', prioridade: 'media', grupo: null });
 

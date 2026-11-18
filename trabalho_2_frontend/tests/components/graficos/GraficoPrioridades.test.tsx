@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { resumoDeTeste } from '../../test-utils/resumoMensal';
-import GraficoPrioridades from './GraficoPrioridades';
+import { resumoDeTeste } from '../../helpers/resumoMensal';
+import GraficoPrioridades from '../../../src/components/graficos/GraficoPrioridades';
 
 describe('GraficoPrioridades', () => {
   it('é uma imagem que diz quantas tarefas de cada prioridade foram concluídas', () => {

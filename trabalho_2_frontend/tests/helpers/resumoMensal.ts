@@ -1,4 +1,4 @@
-import type { ResumoMensal } from '../lib/types';
+import type { ResumoMensal } from '../../src/lib/types';
 
 /** Resumo de exemplo compartilhado pelos testes: outubro (já com tarefas feitas) e novembro (nada feito ainda). */
 export const resumoDeTeste: ResumoMensal = {

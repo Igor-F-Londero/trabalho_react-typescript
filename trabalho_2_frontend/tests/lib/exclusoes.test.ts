@@ -5,7 +5,7 @@ import {
   cancelarPendentes,
   confirmarPendentes,
   idsOcultos,
-} from './exclusoes';
+} from '../../src/lib/exclusoes';
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => {

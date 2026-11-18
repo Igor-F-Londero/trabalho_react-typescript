@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { resumoDeTeste } from '../../test-utils/resumoMensal';
-import GraficoEvolucao from './GraficoEvolucao';
+import { resumoDeTeste } from '../../helpers/resumoMensal';
+import GraficoEvolucao from '../../../src/components/graficos/GraficoEvolucao';
 
 describe('GraficoEvolucao', () => {
   it('é uma imagem descrita por extenso, com tarefas e concluídas de cada mês', () => {

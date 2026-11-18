@@ -8,8 +8,8 @@ import {
   filtrarArvore,
   ocultarIds,
   resumo,
-} from './arvore';
-import type { Arvore, Tarefa } from './types';
+} from '../../src/lib/arvore';
+import type { Arvore, Tarefa } from '../../src/lib/types';
 
 const t = (id: string, extra: Partial<Tarefa> = {}): Tarefa => ({
   _id: id,

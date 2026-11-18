@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import TarefaForm from './TarefaForm';
+import TarefaForm from '../../src/components/TarefaForm';
 
 describe('TarefaForm', () => {
   it('todos os campos têm rótulo visível', () => {

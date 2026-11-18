@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { aplicarTema, salvarTema, temaDoSistema, temaSalvo } from './tema';
+import { aplicarTema, salvarTema, temaDoSistema, temaSalvo } from '../../src/lib/tema';
 
 beforeEach(() => {
   localStorage.clear();

@@ -31,7 +31,7 @@ O backend grava o JWT em um cookie `HttpOnly`; o frontend nunca o lê nem o guar
 - Um 401 em qualquer requisição derruba a sessão e leva ao login.
 - O backend só aceita a origem definida em `FRONTEND_URL` (padrão `http://localhost:5173`). Se mudar a porta do Vite, ajuste essa variável no backend. Front e API devem ficar no mesmo site (ex.: `localhost`) por causa do `SameSite=Lax`.
 
-Estrutura: `src/pages` (telas: login, tarefas e resumo), `src/components` (componentes reutilizáveis; `graficos/` guarda os gráficos do Recharts), `src/hooks` (dados e estado: sessão, árvore, avisos, resumo, exclusão com desfazer), `src/services` (cliente da API) e `src/lib` (tipos e funções puras: árvore, arrastar e soltar, resumo mensal, exclusões adiadas, tema) e `src/test-utils` (dados de exemplo dos testes).
+Estrutura: `src/pages` (telas: login, tarefas e resumo), `src/components` (componentes reutilizáveis; `graficos/` guarda os gráficos do Recharts), `src/hooks` (dados e estado: sessão, árvore, avisos, resumo, exclusão com desfazer), `src/services` (cliente da API) e `src/lib` (tipos e funções puras: árvore, arrastar e soltar, resumo mensal, exclusões adiadas, tema). Os testes ficam em `tests/` (espelham `src/`: `components`, `lib`, `pages`, `services`, `App.test.tsx`; `helpers/` guarda dados de exemplo e `setup.ts` a configuração).
 
 ## Executar
 

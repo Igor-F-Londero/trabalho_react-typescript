@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import Icone, { type NomeIcone } from './Icone';
+import Icone, { type NomeIcone } from '../../src/components/Icone';
 
 const NOMES: NomeIcone[] = [
   'pasta', 'subpasta', 'pastaSimples', 'tarefaMais', 'lapis', 'lixeira', 'salvar', 'ok', 'x',

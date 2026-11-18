@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { FILTRO_VAZIO } from '../lib/arvore';
-import Filtros from './Filtros';
+import { FILTRO_VAZIO } from '../../src/lib/arvore';
+import Filtros from '../../src/components/Filtros';
 
 describe('Filtros', () => {
   it('não mostra "limpar" sem filtro ativo', () => {

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { resumoDeTeste } from '../test-utils/resumoMensal';
-import TabelaMensal from './TabelaMensal';
+import { resumoDeTeste } from '../helpers/resumoMensal';
+import TabelaMensal from '../../src/components/TabelaMensal';
 
 const hoje = new Date(2026, 9, 15);
 const montar = () => render(<TabelaMensal resumo={resumoDeTeste} hoje={hoje} />);

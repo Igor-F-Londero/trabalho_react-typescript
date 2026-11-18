@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatarMes, formatarMesCurto, formatarPercentual, situacaoDoMes } from './resumoMensal';
+import { formatarMes, formatarMesCurto, formatarPercentual, situacaoDoMes } from '../../src/lib/resumoMensal';
 
 describe('resumoMensal', () => {
   it('formata o mês por extenso em português, sem escorregar por fuso', () => {
